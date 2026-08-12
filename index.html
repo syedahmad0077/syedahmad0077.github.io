@@ -1540,6 +1540,38 @@
 </head>
 <body>
 
+    <script>
+        (function () {
+            var refreshFlag = "site-cache-reset-v1";
+            if (sessionStorage.getItem(refreshFlag) === "done") return;
+
+            async function clearStaleCaches() {
+                try {
+                    if ("serviceWorker" in navigator) {
+                        var regs = await navigator.serviceWorker.getRegistrations();
+                        for (var i = 0; i < regs.length; i++) {
+                            await regs[i].unregister();
+                        }
+                    }
+
+                    if ("caches" in window) {
+                        var keys = await caches.keys();
+                        for (var j = 0; j < keys.length; j++) {
+                            await caches.delete(keys[j]);
+                        }
+                    }
+
+                    sessionStorage.setItem(refreshFlag, "done");
+                    location.reload();
+                } catch (e) {
+                    sessionStorage.setItem(refreshFlag, "done");
+                }
+            }
+
+            clearStaleCaches();
+        })();
+    </script>
+
     <!-- Scroll Progress Bar -->
     <div id="scrollProgress"></div>
 
